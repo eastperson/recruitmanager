@@ -22,6 +22,8 @@ public class CompanyDto {
 
     private String link;
 
+    private String detail;
+
     private List<JobDto> jobs;
 
     public CompanyDto(Company source){

@@ -32,6 +32,8 @@ public class Company {
     //@Column(unique = true)
     private String name;
 
+    private String detail;
+
     @Lob
     @Basic(fetch = FetchType.LAZY)
     private String logo;

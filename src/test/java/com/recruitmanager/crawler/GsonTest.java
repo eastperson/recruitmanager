@@ -39,7 +39,7 @@ public class GsonTest {
         jobs.add(job);
         jobs.add(job);
 
-        company.setJobs(jobs);
+        company.setJobList(jobs);
         //job.setCompany(company);
 
         log.info("company : " + company);

@@ -1,10 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 
+<head th:replace="fragments.html :: head"></head>
+<style>
+    .main_wrapper{
+        margin: 30px 50px;
+    }
+    .logo {
+
+    }
+</style>
+<body>
+<div th:replace="fragments.html :: navbar"></div>
+<div class="main_wrapper">
+    <div class="alert alert-primary" role="alert" th:if="${message}" th:text="${message}">
+    </div>
+    <form id="keywordForm" th:action="@{/rocketpunch}" th:method="get">
+        <h2>로켓펀치 채용 정보 크롤링</h2>
+        <div id="inputBox">
+
+        </div>
+        <input name="keywords" placeholder="키워드를 입력하세요">
+        <button id="keyowrdAddBtn" type="button">키워드 추가</button>
+        <button id="formBtn" type="submit">제출</button>
+    </form>
+    <div class="card mb-3" style="max-width: 1200px;" th:each="company : ${clist}">
+        <div class="row g-0">
+            <div class="col-md-1 logo">
+                <img th:src="${company.getLogo()}" alt="...">
+            </div>
+            <div class="col-md-11">
+                <div class="card-body">
+                    <a th:href="${company.getLink()}"><h5 class="card-title" th:text="${company.getName()}">Card title</h5></a>
+                    <p class="card-text" th:text="${company.getDetail()}">This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
+                </div>
+                <div class="card-footer" th:each="job : ${company.getJobList()}">
+                    <a th:href="${job.getLink()}"><small class="text-muted" th:text="${job.getName()}">Last updated 3 mins ago</small></a>
+                    <small class="text-muted" th:text="${job.getStat()}">Last updated 3 mins ago</small>
+                    <small class="text-muted" th:text="${job.getDate()}">Last updated 3 mins ago</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const keywordAddBtn = document.querySelector("#keyowrdAddBtn"),
+             inputBox = document.querySelector("#inputBox");
+
+    keywordAddBtn.addEventListener("click",(e)=>{
+        e.preventDefault();
+
+        let input = document.createElement('input');
+        input.setAttribute("name","keywords");
+        input.setAttribute("placeholder","키워드를 입력하세요.");
+        input.setAttribute("type","text");
+
+        inputBox.append(input);
+
+    });
+</script>
 </body>
 </html>
