@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@yaireo/tagify": "^3.23.1",
     "admin-lte": "^3.0.5",
     "bootstrap": "^4.6.0",
     "font-awesome": "^4.7.0",

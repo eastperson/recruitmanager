@@ -24,7 +24,7 @@ import java.util.List;
 @EqualsAndHashCode(of = "id")
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter @Builder
-public class Job {
+public class Job extends BaseEntity{
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id = null;

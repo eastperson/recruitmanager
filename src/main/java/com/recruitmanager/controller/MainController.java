@@ -1,16 +1,22 @@
 package com.recruitmanager.controller;
 
+import com.recruitmanager.dto.CompanyDto;
+import com.recruitmanager.dto.page.PageRequestDTO;
+import com.recruitmanager.dto.page.PageResultDTO;
 import com.recruitmanager.handler.RestTemplateResponseErrorHandler;
 import com.recruitmanager.model.Company;
 import com.recruitmanager.repository.CompanyRepository;
+import com.recruitmanager.service.CompanyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -18,6 +24,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,13 +34,30 @@ import java.util.List;
 public class MainController {
 
     private final CompanyRepository companyRepository;
+    private final CompanyService companyService;
+    private final ModelMapper modelMapper;
 
     @GetMapping
-    public String main(Model model){
+    public String main(Model model, Integer page, Integer size, String type, String keyword){
 
-        List<Company> clist = companyRepository.findAll();
+        if(type == null) type = "C";
+        if(page == null || page <= 0) page = 1;
+        if(size == null || size <= 0) size = 10;
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().size(size).page(page).type(type).keyword(keyword).build();
 
-        model.addAttribute("clist",clist);
+        PageResultDTO<CompanyDto,Company> pageResultDTO = companyService.getList(pageRequestDTO);
+
+        List<CompanyDto> companyDtoList = new ArrayList<>();
+
+        for(CompanyDto companyDto : pageResultDTO.getDtoList()){
+            companyDtoList.add(companyDto);
+        }
+
+        //List<Company> clist = companyRepository.findAll();
+
+        model.addAttribute("companyDtoList",companyDtoList);
+        model.addAttribute(pageResultDTO);
+        model.addAttribute(pageRequestDTO);
 
         return "index";
     }
@@ -45,30 +69,13 @@ public class MainController {
 
         log.info("keywords : " + Arrays.toString(keywords));
 
-        RestTemplate restTemplate = new RestTemplate();
-
-        restTemplate.getMessageConverters().add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
-
-        RestTemplateResponseErrorHandler erroHandler = new RestTemplateResponseErrorHandler();
-
-        restTemplate.setErrorHandler(erroHandler);
-
-        String url = "http://localhost:8080/api/rocketpunch";
-
-        UriComponents uri = UriComponentsBuilder.fromUriString(url)
-                .queryParam("keywords",keywords)
-                .build();
-
-        HttpHeaders headers = new HttpHeaders();
-
-        RequestEntity<String> rq = new RequestEntity<>(headers, HttpMethod.GET, uri.toUri());
-
-        String getJson = restTemplate.getForObject(uri.toUri(),String.class);
+        String getJson = companyService.getRocketpunchJson(keywords);
 
         redirectAttributes.addFlashAttribute("message","크롤링이 실패했습니다.");
 
         if(getJson != null) {
             redirectAttributes.addFlashAttribute("message","크롤링이 완료되었습니다.");
+            redirectAttributes.addFlashAttribute("keyworeds",keywords);
         }
 
         log.info("get json : "+getJson);
@@ -77,5 +84,7 @@ public class MainController {
 
         return "redirect:/";
     }
+
+
 
 }

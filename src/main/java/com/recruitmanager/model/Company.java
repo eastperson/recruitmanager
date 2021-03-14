@@ -1,5 +1,6 @@
 package com.recruitmanager.model;
 
+import com.recruitmanager.dto.CompanyDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -7,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.modelmapper.ModelMapper;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -23,7 +25,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Builder
 @Setter @ToString
-public class Company {
+public class Company extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,4 +45,9 @@ public class Company {
 
     @OneToMany(fetch = FetchType.LAZY)
     private List<Job> jobList;
+
+    public CompanyDto entityToDto() {
+
+        return new CompanyDto(this);
+    }
 }
